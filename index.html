@@ -1,1 +1,97 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Articles France 24 - Style TikTok</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #000;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        #articles-container {
+            width: 300px;
+            height: 500px;
+            overflow-y: scroll;
+            scroll-snap-type: y mandatory;
+        }
+
+        .article {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            scroll-snap-align: start;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        .article-content {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .article-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 0;
+        }
+
+        .article-description {
+            font-size: 14px;
+            margin: 5px 0 0;
+        }
+    </style>
+</head>
+<body>
+    <div id="articles-container"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const container = document.getElementById('articles-container');
+            const rssUrl = 'https://www.france24.com/fr/france/rss';
+
+            fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}`)
+                .then(response => response.json())
+                .then(data => {
+                    data.items.forEach(item => {
+                        const article = document.createElement('div');
+                        article.className = 'article';
+                        article.style.backgroundImage = `url(${item.enclosure?.link || 'https://via.placeholder.com/300x500'})`;
+
+                        const content = document.createElement('div');
+                        content.className = 'article-content';
+
+                        const title = document.createElement('h2');
+                        title.className = 'article-title';
+                        title.textContent = item.title;
+
+                        const description = document.createElement('p');
+                        description.className = 'article-description';
+                        description.textContent = item.description.replace(/(<([^>]+)>)/gi, "");
+
+                        content.appendChild(title);
+                        content.appendChild(description);
+                        article.appendChild(content);
+                        container.appendChild(article);
+                    });
+                })
+                .catch(error => console.error('Erreur lors de la récupération du flux RSS :', error));
+        });
+    </script>
+</body>
+</html>
 
